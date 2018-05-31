@@ -8,7 +8,7 @@
 
 **基本用法:**
 
-axios是一个全局的对象，并没有挂载到Vue实例上，因此可以直接调用。
+引入插件后，axios是一个全局的对象，并没有挂载到Vue实例上，因此可以直接调用。
 
 ```
 methods:{
@@ -114,6 +114,9 @@ console.log(arr);//Array(3)
 ```
 
 
+***
+
+
 ### Promise使用
 
 之前我们通过callback函数和事件来实现异步操作，层层嵌套，金字塔式，使代码非常臃肿。
@@ -142,8 +145,8 @@ let loadImageAsync(url) {
   });
 };
 
-//也可以链式调用then
-loadImageAsync().then((res) => {
+//这一步可以链式调用then
+loadImageAsync(url).then((res) => {
   document.body.appendChild(res);
   //此处还可以return一个Promise，后面继续指定then
 }).catch((err) => {
@@ -152,20 +155,36 @@ loadImageAsync().then((res) => {
 //catch用来捕获rejected状态，也可以把该回调写入then(resolve回调, rejected回调)
 ```
 
+如果使用`then`方法，依次指定了多个回调函数。第一个回调函数完成以后，会将返回结果作为参数，传入第二个回调函数。
+
+前一个回调函数可能返回一个`Promise`对象，后一个回调函数就会等待该`Promise`对象状态发生变化，才会被调用。
+
+```
+loadImageAsync(url_1).then((res)=>{
+  return loadInfo(url_2);
+}).then(function funcA(resA) {
+  console.log("resolved: ", resA);
+}, function funcB(err){
+  console.log("rejected: ", err);
+});
+```
+
+第一个`then`方法指定的回调函数，返回的是另一个`Promise`对象。这时，第二个`then`方法指定的回调函数，就会等待这个新的`Promise`对象状态发生变化。如果变为`resolved`，就调用`funcA`，如果状态变为`rejected`，就调用`funcB`。
+
+如果要同时调用多个Promise，可以用`Promise.all()`:
+```
+Promise.all([checkLogin(), getUserInfo()]).then(([res1, res2]) => {
+  console.log(res1, res2);
+});
+```
+
+
+***
 
 
 ### ES6的模块化
 
 之前已经详细介绍过:[ES6的模块化](https://github.com/longyincug/Notebook/blob/master/JS%E6%A8%A1%E5%9D%97%E5%8C%96.md#4d)
-
-
-
-
-
-
-
-
-
 
 
 
